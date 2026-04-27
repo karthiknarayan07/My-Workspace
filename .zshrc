@@ -1,3 +1,6 @@
+# Brew & Nix
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
 # Oh My Zsh installation Path.
 export ZSH="$HOME/.oh-my-zsh"
 
@@ -21,9 +24,7 @@ SAVEHIST=5000
 # User configuration
 
 # Starship
-if ! command -v starship &> /dev/null; then
-  echo "⚠️  Starship not found. Please install starship."
-fi
+eval "$(starship init zsh)"
 
 # NVM
 export NVM_DIR="$HOME/.nvm"
@@ -39,18 +40,12 @@ load-nvm() {
 
 add-zsh-hook precmd load-nvm
 
-# Brew
-if ! command -v brew &> /dev/null; then
-  echo "⚠️  Homebrew not found. Please install homebrew."
-fi
-
 # Alias
 alias k="kubectl"
 alias t="terraform"
 alias venv="source .venv/bin/activate"
 alias rs="python manage.py runserver"
 alias rt="python manage.py shell"
-alias nano="zed"
 
 export KUBECTL_DISABLE_HTTP2=true
 
@@ -60,14 +55,12 @@ export PATH=$PATH:/home/karthiknarayan/.kubescape/bin
 export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 export PATH=$JAVA_HOME/bin:$PATH
 
-# Run Unison in background quietly
-(unison credentials >/dev/null 2>&1 &)
-
+export PAGER=""
 export KUBECTL_DISABLE_HTTP2=true
 export BROWSER="wslview"
 export AWS_CLI_BROWSER="wslview"
 export AWS_PAGER=""
-
+export AWS_PROFILE="AdministratorAccess"
 # AWS SSO login helper: prints verification URL/code, then runs STS identity
 alogin() {
   # Use first argument as profile, default is AdministratorAccess
@@ -93,6 +86,7 @@ alogin() {
   echo "✅ SSO login successful."
   echo "🧾 Running: aws sts get-caller-identity"
   aws sts get-caller-identity --profile "${profile}"
+  export AWS_PROFILE="${profile}"
 }
 
 # Helper for switching namespace quickly
@@ -100,3 +94,8 @@ ks() {
   [ $# -gt 1 ] && echo "Usage: ks [namespace]" && return 1
   kubectl config set-context --current --namespace="${1:-default}"
 }
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+export CLAUDE_CODE_USE_BEDROCK=1
+export DISABLE_PROMPT_CACHING=1
